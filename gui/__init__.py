@@ -23,10 +23,13 @@ import ffmpeg.audio
 import ffmpeg.video
 
 import tkinter
+import tkinter.filedialog
 
 import gui.ffprobe
 
 import netifaces
+
+import files
 
 
 def get_addrs():
@@ -47,7 +50,7 @@ class Launch_bar(tkinter.Frame):
     
     """Class to hold the text input and buttons for launching various tools."""
     
-    def __init__(self, master):
+    def __init__(self, master, stream_url = None, loc_ip = None):
         
         """Construct the launch bar.
         
@@ -63,7 +66,7 @@ class Launch_bar(tkinter.Frame):
         
         self.stream_input = tkinter.Entry(input_frame)
         self.stream_input.pack(fill = tkinter.X, expand = 1, side = tkinter.LEFT)
-        self.stream_input.insert(0, "udp://239.1.1.1:5000")
+        self.stream_input.insert(0, stream_url if stream_url else "udp://239.1.1.1:5000")
         
         addr_frame = tkinter.Frame(input_frame)
         
@@ -72,7 +75,7 @@ class Launch_bar(tkinter.Frame):
         
         self.ip_addr = tkinter.StringVar()
         self.ip_select = tkinter.OptionMenu(addr_frame, self.ip_addr, *get_addrs())
-        self.ip_addr.set(next(get_addrs()))
+        self.ip_addr.set(loc_ip if loc_ip else next(get_addrs()))
         self.ip_select.pack(fill = tkinter.X, expand = 1, side = tkinter.RIGHT)
         
         addr_frame.pack(fill = tkinter.X, expand = 1)
@@ -179,6 +182,12 @@ class Launch_bar(tkinter.Frame):
         """Start an audio loudness meter tile."""
         
         ffmpeg.audio.Loudness(self.get_stream_source())
+        
+    def save_dict(self):
+        
+        """Return the dictionary of stream_url and loc_ip."""
+        
+        return {"url": self.stream_input.get(), "loc_ip": self.ip_addr.get()}
     
         
 class Main_Window():
@@ -189,6 +198,8 @@ class Main_Window():
     
         """Construct and launch the main window."""
         
+        self._launch_bars = []
+        
         self.root = tkinter.Tk()
         
         self.root.title("Vidalyser")
@@ -197,16 +208,56 @@ class Main_Window():
         frame.pack()
         add_button = tkinter.Button(frame, text = "Add stream", command = self.add_stream)
         add_button.pack()
+        
+        menubar = tkinter.Menu(self.root)
+        
+        filemenu = tkinter.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Open", command=self.open)
+        filemenu.add_command(label="Save as", command=self.save)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self.root.quit)
+        
+        menubar.add_cascade(label="File", menu=filemenu)
+        
+        helpmenu = tkinter.Menu(menubar, tearoff=0)
+        helpmenu.add_command(label="About", command=self.about)
+        
+        menubar.add_cascade(label="Help", menu=helpmenu)
+        
+        self.root.config(menu=menubar)
     
+    def save(self):
+        
+        filename = tkinter.filedialog.asksaveasfilename(defaultextension = ".json", filetypes = [("JSON files", ".json"), ("All files", ".*")])
+        
+        files.save_file(filename, self)
     
-    def add_stream(self):
+    def open(self):
+        
+        filename = tkinter.filedialog.askopenfilename(defaultextension = ".json", filetypes = [("JSON files", ".json"), ("All files", ".*")])
+
+        files.load_file(filename, self)
+    
+    def about(self):
+        
+        pass
+    
+    def add_stream(self, stream_url = None, loc_ip = None):
         
         """Add an instance of Launch_Bar into this window."""
     
         frame = tkinter.LabelFrame(self.root)
         frame.pack()
-        gui.Launch_bar(frame)
+        launch_bar = gui.Launch_bar(frame, stream_url, loc_ip)
+        
+        self._launch_bars.append(launch_bar)
     
+    
+    def launch_bars(self):
+        
+        """Return the current launch bars."""
+        
+        return self._launch_bars
         
     def mainloop(self):
         
