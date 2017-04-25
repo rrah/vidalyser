@@ -1,3 +1,23 @@
+"""FFmpeg wrapper classes, for various FFmpeg processes.
+
+Author: Robert Walker <rrah99@gmail.com>
+
+    This file is part of Vidalyser.
+    
+    Vidalyser is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    Vidalyser is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Vidalyser.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import logging
 import subprocess
 import threading
@@ -56,7 +76,8 @@ class MVTile(Ffmpeg):
     
     """Multiview style tile process."""
     
-    _ffmpeg_filter = ["[0:a]showvolume=v=0:o=v:h=10:w=340:b=1,pad=w=626:h=340:x=605[vol0]; [0:v]scale=w=605:h=340[vid0]; [vol0][vid0]overlay[v]"]
+	
+    _ffmpeg_filter = ["[0:a]showvolume=v=0:o=v:h=10:w=340:b=1:f=0.001,pad=w=626:h=340:x=605[vol0]; [0:v]scale=w=605:h=340[vid0]; [vol0][vid0]overlay[v]"]
         
         
 class Ffplay(Ffmpeg):

@@ -109,6 +109,8 @@ class Launch_bar(tkinter.Frame):
         
     def get_stream_source(self):
         
+        """Pull the entered stream info out of the gui."""
+        
         input_string = self.stream_input.get()
         
         if input_string[0:6] == "udp://":
