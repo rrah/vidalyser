@@ -1,6 +1,4 @@
-[![Build Status](https://ci.rrah.me/buildStatus/icon?job=vidalyser)](https://ci.rrah.me/job/vidalyser)
-
-# vidalyser
+# vidalyser [![Build Status](https://ci.rrah.me/buildStatus/icon?job=vidalyser)](https://ci.rrah.me/job/vidalyser)
 GUI to launch various ffmpeg commands to analyse RTMP/UDP streams. 
 
 ## Requirements
